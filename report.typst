@@ -1,0 +1,50 @@
+#set page(margin: 2cm)
+#set text(size: 11pt)
+#set heading(numbering: "1.")
+
+#align(center)[
+  #text(size: 16pt, weight: "bold")[Lab0 – Fundamentals of Continuous Integration]
+]
+
+= Project
+
+In this lab, I programmed several preprocessing functions and a command line interface with Click. The CLI has a main group cli and four groups: clean, numeric, text and struct.
+
+= Testing logic
+
+I have two testing files.
+
+*Unit tests :* Here I test each function of preprocessing directly. For each function, I check a normal case and also some special cases:
+- a list with `None`, `''` and `nan` for the missing values,
+- a list where all the values are equal for `normalize` and `standardize`, to check there is no division by 0,
+- negative numbers and 0 for `log_transform`,
+- strings like `"abc"` or `"2.5"` for `to_integers`, they must be removed,
+- the same seed must give the same result for `shuffle`.
+
+For standardize, I don't compare exact values. I check that the result has a mean of 0 and a standard deviation of 1.
+
+I use two fixtures: `numbers`, a list of numbers used in several tests, and `values_with_missing`, a list with missing values. I use `parametrize` on `remove_duplicates` (no options) and on `normalize` and `clip` (with options). This way, I run the same test with different values.
+
+*Integration tests :* Here I check that the CLI commands give the right output when they use the functions of the logic. I use a fixture `runner` that creates a CliRunner, shared by all the tests. For each command, I check that it runs without error (`exit_code == 0`) and that the output is correct. I also test the options, for example `--new-min` and `--new-max`.
+
+= Results
+
+== Formatting (black)
+
+#figure(image("rss/black.png", width: 90%), caption: [Result of black])
+
+== Linting (pylint)
+
+#figure(image("rss/pylint.png", width: 90%), caption: [Result of pylint])
+
+== Tests (pytest)
+
+#figure(image("rss/pytest.png", width: 90%), caption: [Result of pytest])
+
+All the 41 tests pass.
+
+== Coverage (pytest-cov)
+
+#figure(image("rss/coverage.png", width: 90%), caption: [Coverage of the tests])
+
+The coverage is 99%. The only line not tested is cli() under `if __name__ == "__main__"`, because the tests call the CLI with CliRunner and not from the terminal.
